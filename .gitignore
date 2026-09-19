@@ -7,3 +7,6 @@ __pycache__/
 # local data: use a named volume in docker-compose.yml, never a bind mount
 data/
 *.db
+# local secrets: never commit
+.env
+.env.*

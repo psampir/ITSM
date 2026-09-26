@@ -17,7 +17,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from . import sla, store
+from . import metrics, sla, store
 
 C1 = "wallclock"
 C2 = "reopen"
@@ -284,3 +284,62 @@ def reopen(
     ticket["closed_at"] = None
     store.save(ticket)
     return ticket
+
+
+TICKET_PHASES: tuple[tuple[str, str], ...] = (
+    ("created", "created_at"),
+    ("acknowledged", "acknowledged_at"),
+    ("resolved", "resolved_at"),
+    ("closed", "closed_at"),
+)
+
+
+@app.post("/dora/metrics")
+async def dora_metrics(request: Request) -> JSONResponse:
+    try:
+        body = await request.json()
+    except Exception:
+        raise ApiError(400, "invalid_body", "the request body is not valid JSON")
+    if not isinstance(body, dict):
+        raise ApiError(422, "validation", "the request body must be a JSON object")
+
+    window = body.get("window")
+    if not isinstance(window, dict):
+        raise ApiError(422, "validation", "window is required and must be an object")
+    raw_from = window.get("from")
+    raw_to = window.get("to")
+    events = body.get("events")
+    if not isinstance(events, list):
+        raise ApiError(422, "validation", "events is required and must be an array")
+
+    try:
+        start = metrics.parse_instant(raw_from)
+        end = metrics.parse_instant(raw_to)
+        if end <= start:
+            raise ApiError(422, "validation", "window.to must be after window.from")
+        result = metrics.compute(events, start, end)
+    except metrics.InvalidLog as exc:
+        raise ApiError(422, "malformed_log", str(exc))
+
+    result["spec_version"] = metrics.SPEC_VERSION
+    result["window"] = {"from": raw_from, "to": raw_to}
+    return JSONResponse(status_code=200, content=result)
+
+
+@app.get("/dora/ticket-events")
+def dora_ticket_events() -> list[dict]:
+    stream: list[dict] = []
+    for ticket in store.all_tickets():
+        for phase, field in TICKET_PHASES:
+            at = ticket.get(field)
+            if not at:
+                continue
+            stream.append({
+                "ticket_id": ticket["id"],
+                "at": at,
+                "phase": phase,
+                "priority": ticket.get("priority"),
+                "state": "new" if phase == "created" else phase,
+            })
+    stream.sort(key=lambda event: (event["at"], event["ticket_id"]))
+    return stream

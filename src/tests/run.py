@@ -144,6 +144,47 @@ def main() -> int:
     check("T4 resolve tie", t4.get("sla", {}).get("resolve_due_at") == "2026-10-19T14:00:00Z")
     check("T4 ack due", t4.get("sla", {}).get("ack_due_at") == "2026-10-19T07:00:00Z")
 
+    window = {"from": "2026-09-01T00:00:00Z", "to": "2026-09-22T00:00:00Z"}
+    status, body = request("POST", "/dora/metrics", {"window": window, "events": []})
+    check(
+        "dora empty log",
+        status == 200
+        and body.get("deployment_frequency_per_day") == 0.0
+        and body.get("change_lead_time_seconds_p50") is None
+        and body.get("change_fail_rate") is None,
+    )
+    check("dora spec_version", body.get("spec_version") == "1.0.0")
+
+    synthetic = [
+        {"event_id": "c-1", "type": "commit", "at": "2026-09-02T00:00:00Z", "sha": "s-1",
+         "branch": "main", "change_id": "CHG-X", "reverts": None},
+        {"event_id": "d-1", "type": "deployment", "at": "2026-09-02T02:00:00Z",
+         "deployment_id": "DEP-X", "environment": "production", "outcome": "success",
+         "commits": ["s-1"], "unplanned": False, "caused_by": None},
+    ]
+    status, body = request("POST", "/dora/metrics", {"window": window, "events": synthetic})
+    check("dora lead time 7200", status == 200 and body.get("change_lead_time_seconds_p50") == 7200)
+    check(
+        "dora one deployment one change",
+        body.get("counts", {}).get("deployments") == 1 and body.get("counts", {}).get("changes") == 1,
+    )
+
+    status, _ = request("POST", "/dora/metrics", {"window": {"from": window["to"], "to": window["from"]}, "events": []})
+    check("dora empty window rejected", status in (400, 422))
+    status, _ = request("POST", "/dora/metrics", {"window": window})
+    check("dora missing events rejected", status in (400, 422))
+    status, _ = request("POST", "/dora/metrics", {"window": window, "events": [
+        {"event_id": "c-2", "type": "commit", "at": "2026-09-02T00:00:00Z", "sha": "s-2",
+         "branch": "main", "change_id": None, "reverts": "nope"}]})
+    check("dora malformed log rejected", status in (400, 422))
+
+    status, stream = request("GET", "/dora/ticket-events")
+    check("dora ticket-events is an array", status == 200 and isinstance(stream, list))
+    if isinstance(stream, list):
+        check("dora ticket-events ordered", stream == sorted(stream, key=lambda e: (e["at"], e["ticket_id"])))
+    else:
+        check("dora ticket-events ordered", False)
+
     print(f"ITSMLAB-TESTS: passed={_passed} failed={_failed}")
     return 0 if _failed == 0 else 1
 

@@ -1,0 +1,279 @@
+
+2. Lean, Kanban, DevOps and the five delivery metrics
+
+Saturday 26 September 2026 - lecture 80 min + 10 min of questions, laboratory 150 min, fully online.
+You will learn
+
+    Lean: waste and value-stream mapping.
+    Kanban: visual flow and WIP limits, Kanban versus Scrum and when each one fits.
+    Retrospectives that end in action items, task planning and T-shirt sizing, and honest capacity estimation that accounts for holidays, customer issues and technical debt.
+    DevOps as the collapse of the wall between development and operations.
+    The five DORA software delivery metrics, with Reliability as a quasi-metric, and why Deployment Rework Rate was added as the fifth - it is the one that catches AI-inflated throughput.
+    The DORA AI Capabilities Model as the map for the rest of the semester.
+    Goodhart's law: every metric in this lecture can be gamed, and AI makes gaming cheap.
+
+    Lecture 2 slides File
+
+    The slides shown in the session, 35 pages, as presented on Saturday 26 September 2026. The sources cited on the last slide are linked one by one in the Reading list below.
+
+    To do before the class
+        Finish Laboratory 1. Laboratory 2 adds two endpoints to the svcdesk you built in Laboratory 1, so you need that service running; no checkpoint is published for Laboratory 2. The Laboratory 1 correction window has been extended to Sunday 27 September 2026, 23:59:59 (Europe/Warsaw): finish Laboratory 1, receipt it by Sunday evening and collect its marks, then build Laboratory 2 on your own service. Laboratory 2 has its own correction window, until Saturday 10 October.
+        Update the checker. Run docker pull ghcr.io/swasik/itsmlab:2026, then ./itsmlab.sh --version (Windows: .\itsmlab.ps1 --version). It must print itsmlab 0.3.2 or newer. An image pulled before 25 September does not know Laboratory 2, so checks 2 and verify 2 would not work with it.
+        Download the Laboratory 2 package from this topic and read HANDOUT.md. If you have time, read METRIC-SPEC.md too: the 150 minutes of the laboratory are for applying it, not for a first reading.
+
+    Reading list
+
+    Supplementary material for the lecture. Nothing here is compulsory and nothing here is examined; these are the primary sources behind the claims made in the lecture, so that you can check them yourself. Two of the books below were read for this lecture only through secondary summaries, and the list says which: a citation you have not checked yourself should say so too.
+    The five metrics, word for word
+        DORA, DORA's software delivery performance metrics (the metrics guide, last updated 5 January 2026): dora.dev/guides/dora-metrics. The five definitions on the slides are quoted from here word for word. The same page lists seven pitfalls of the metrics, and the first of them is setting a metric as a goal: read that list before Laboratory 2 asks you to game one.
+        Nathen Harvey, A history of DORA's software delivery metrics (2 January 2026): dora.dev/insights/dora-metrics-history. How four variables tested in 2014 became five metrics in 2024, and DORA's own correction about reliability: the 2021 report "inaccurately called the 'reliability' metric the 'fifth metric'". The lecture follows this account wherever it differs from Wikipedia's.
+        DORA, Accelerate State of DevOps 2024 (nearly 3,000 respondents): dora.dev/research/2024/dora-report. Pages 10 and 11 explain why four metrics became five and give the survey question behind deployment rework rate. Page 39 has the two estimates the lecture charts, a 1.5 % reduction in throughput and a 7.2 % reduction in stability for every 25 % increase in AI adoption; look at their uncertainty intervals in Figure 10 before you repeat either number.
+    AI and the delivery system
+        DORA, State of AI-assisted Software Development 2025 (nearly 5,000 technology professionals): dora.dev/dora-report-2025. Already in the Lecture 1 reading list; this time for three things: the five metrics as the report defines them (p. 15), what changed against 2024 and what did not (pp. 42-43), and the value stream management chapter (pp. 73-78), which finds that value stream management moderates the effect of AI on organisational performance and ends by asking whether your team can draw its own value stream on a whiteboard.
+        DORA, The ROI of AI-assisted Software Development (v. 2026.1, 22 April 2026): dora.dev/ai/roi/report. The J-Curve, its three causes including the verification tax, and the sample calculator. The DORA page summarises the report without a form; the full PDF is on Google Cloud behind a registration form, linked from that page.
+        Jessica Baolin and Nathen Harvey, Balancing AI tensions: Moving from AI adoption to effective SDLC use (DORA, 10 March 2026): dora.dev/insights/balancing-ai-tensions. A thematic analysis of 1,110 open-ended answers from Google engineers, and the source of the line "Time saved writing is often re-spent auditing". Its advice on estimates belongs next to the capacity slide: do not cut them before closing the gap between a prototype and production quality.
+    Lean and the value stream
+        James P. Womack and Daniel T. Jones, Lean Thinking (1996; 2nd edition 2003). The definition of Lean and the five principles, in their own order. Read for this lecture only through secondary summaries, not the book, as the sources slide says; check the book before you quote either.
+        Mary and Tom Poppendieck, Lean Software Development: An Agile Toolkit (2003). The pairing of the seven factory wastes with their software counterparts. The same caveat applies: read through secondary summaries.
+        Taiichi Ohno, Toyota Production System: Beyond Large-Scale Production (1978; English edition 1988). The seven wastes themselves. Some summaries credit them to Shigeo Shingo; the standard attribution is Ohno's, and the lecture follows it.
+        DORA, Value stream mapping for software delivery: dora.dev/guides/value-stream-management. The definition of a value stream map, the default scope from commit to production, and the two value streams, the happy path and the recovery stream, with the sentence "Failed deployment recovery time is essentially lead time for these breakfixes." Its advice that a map needs only low precision is worth remembering when you draw your own.
+    Kanban, flow and the rituals
+        John Coleman and Daniel Vacanti, The Kanban Guide (May 2025): kanbanguides.org/the-kanban-guide. Short. The three practices, the WIP limit as a signal that there is capacity, and the four flow metrics are quoted from it.
+        David J. Anderson, Kanban: Successful Evolutionary Change for Your Technology Business (Blue Hole Press, 2010), and David J. Anderson and Andy Carmichael, Essential Kanban Condensed (2016). The older and more prescriptive Kanban Method, if you want to see where the guide's practices came from.
+        John D. C. Little, "A Proof for the Queuing Formula: L = λW", Operations Research 9(3), 1961, pp. 383-387. Little's law: cycle time equals WIP divided by throughput, as arithmetic rather than opinion. Paywalled, so no link: look it up through the university library by its DOI, 10.1287/opre.9.3.383.
+        Norm Kerth, Project Retrospectives: A Handbook for Team Reviews (2001). The Retrospective Prime Directive, quoted in full on the sources slide; the text and its history are on the Agile Retrospective Resource Wiki: retrospectivewiki.org.
+        Dwight D. Eisenhower, Address at the Second Assembly of the World Council of Churches, Evanston, Illinois (19 August 1954): presidency.ucsb.edu. The urgent and the important, in the transcript. Eisenhower was quoting a former college president and drew no matrix; the four-box drawing named after him came later.
+    DevOps
+        DevOpsDays Ghent 2009, the first DevOpsDays, founded by Patrick Debois: devopsdays.org. The archived page of the first conference, with its programme and speakers.
+        Nicole Forsgren, Jez Humble and Gene Kim, Accelerate: The Science of Lean Software and DevOps (IT Revolution, 2018). The three founders of DORA on the research behind the metrics, at book length. The survey series it grew from began with the first State of DevOps report, published by Puppet Labs in 2012.
+    Goodhart, and the debate
+        Evan Conaway, Finding balance in the era of tokenmaxxing (DORA, 2 June 2026): dora.dev/insights/finding-balance-in-the-era-of-tokenmaxxing. Both sides of the debate, what Salesforce, Shopify and Starburst did instead, and DORA's verdict that company-wide aggregates are meaningless and individual scores harmful. It quotes Goodhart's law as "when a metric becomes a target": compare that with the next entry.
+        Marilyn Strathern, "Improving ratings": audit in the British University system, European Review 5(3), 1997. Already in the Lecture 1 reading list: the phrasing on the slide, "When a measure becomes a target, it ceases to be a good measure", one word away from the way DORA quotes it. Paywalled, so no link.
+
+    Laboratory 2 - Measure your own delivery, and prove the metrics are gameable
+
+    Saturday 26 September 2026, 150 minutes, fully online · AI Assessment Scale level 3 (AI-assisted) · peak container RAM about 0.5 GB · the Core items take 110 minutes, leaving 40 minutes of slack.
+    Goal
+
+    You extend the svcdesk you built in Laboratory 1, in the same language and with the same Docker Compose setup, with two endpoints. POST /dora/metrics computes DORA's five software delivery metrics (deployment frequency, change lead time, change fail rate, failed deployment recovery time and deployment rework rate) from a supplied JSONL event log. GET /dora/ticket-events exports your own tickets as a lifecycle stream, which later laboratories build on.
+
+    Then you demonstrate Goodhart's law with arithmetic attached: a change to the event log that improves at least one of the five metrics while making delivery measurably worse. The rules are published in full and only the graded data is withheld. An AI assistant will give you five metric definitions in one prompt, and they will be right about the easy cases and wrong about six specific ones that are in the log on purpose. Applying the specification to messy data is the work of this laboratory.
+    What to read, in this order
+
+    All the files are in Laboratory 2 package in this topic.
+        HANDOUT.md - the full laboratory sheet: the goal, the minute budget, the six edge cases, Core and Stretch, AI usage, the deliverables and the submission steps. Start here.
+        METRIC-SPEC.md - the whole rulebook: the event log format, the five metrics, rules R-01 to R-21, the two endpoints, the gaming gates and the tolerances. Where an assistant and this document disagree, this document wins.
+        CHECKS.md - every check the checker runs, with what it expects. When a check fails, its id leads you here, and from here to the rule in METRIC-SPEC.md.
+        EDGE-CASES-template.md and gaming-template.json - the shapes of your reasoning artifact and of gaming.json.
+        fixtures/ - the practice event log (230 events) and its published expected values, the answer key for the practice set. You copy this folder into your repository in step 1 of the instructions.
+
+    ./itsmlab.sh checks 2 (Windows: .\itsmlab.ps1 checks 2) prints the same catalogue as CHECKS.md straight from the checker; it runs nothing, so it is safe at any point in the laboratory. Questions go to the course forum, always with the check id (for example L2-CORE-3.12).
+    The six edge cases: the heart of this laboratory
+
+    Each edge case is covered by a published rule in METRIC-SPEC.md, and each one defeats a definition that models reliably produce. All six are in the practice fixture and in the graded one; what differs between the two is the data, never the rules.
+    id	what the log contains	rule
+    E1	a commit timestamped after the deployment that shipped it (clock skew)	R-08
+    E2	a commit that reverts a commit that is itself a revert	R-06
+    E3	a hotfix deployed straight to production, never on main	R-09
+    E4	a production deployment with no linked commits	R-10
+    E5	a deployment that failed and never recovered	R-12
+    E6	incidents whose intervals overlap	R-13
+    What is graded
+
+    The laboratory is worth 12.5 % of the course, in three parts.
+        Core bundle, 8 %. Pass or fail as a whole: every Core specification must pass, and there is no partial credit inside the bundle.
+            L2-CORE-1 compose-up - the compose contract of Laboratory 1 still holds: your service builds from your repository and GET /health answers within 120 s.
+            L2-CORE-2 dora-api - the endpoint contract: the response shape, purity, order independence, duplicate events, the empty log, four rejections, and GET /dora/ticket-events.
+            L2-CORE-3 metrics-practice - the five metrics, every count and every anomaly for the practice fixture, plus metrics.json.
+            L2-CORE-4 edge-cases - EDGE-CASES.md, and the consistency gate: the six counts you declare must equal what your own service reports. As with DECISIONS.md in Laboratory 1, you may not declare one thing and ship another.
+            L2-CORE-5 gaming - conservation (R-19), both metric objects re-derived from your own service, the improvement margin (R-20) and the harm margin (R-21).
+            L2-CORE-6 prediction-order - grader-only: when PREDICTION.md exists, a prediction receipt must exist and the feature's commits must descend from it; without a PREDICTION.md it passes. A prediction the grader cannot confirm from its receipt costs L2-STRETCH-1, not Core; deleting PREDICTION.md withdraws it. Locally this specification is always reported as skip, with a message that lists the commits already touching feature_path.
+        Stretch bundle, 3 %. Passes at any two of three options; each option counts the same.
+            L2-STRETCH-1 metr-n1 - an n=1 METR self-replication: predict in PREDICTION.md how long a named feature will take, receipt the prediction before the feature's first commit, build it, and record the outcome in METR.md with the ratio actual/predicted. A speed-up and a slow-down score identically. Tier A checks the structure; the grader also needs the prediction confirmed by its receipt (L2-CORE-6).
+            L2-STRETCH-2 rework-class - the deployment rework rate over the class's shared repository history, computed with gh api, with the captured payload committed and the result recorded in rework-class.json.
+            L2-STRETCH-3 own-tests - your own pytest suite behind the compose tests profile: it exits 0 within 300 s and its last line is ITSMLAB-TESTS: passed=<n> failed=0 with n at least 10.
+        Reasoning artifact, 1.5 %. EDGE-CASES.md, read by the lecturer. In each of its six sections, say what a default definition would have done and what that would have cost the person reading the dashboard. End the file with a section ## Gaming demonstration, after ## E6: which metric you improved and which rule you exploited, which incentive would produce that change in a real team, and who would have been rewarded for it. Plain prose; you are graded on whether you understood why each rule is the way it is. Reasoning artifacts are pre-screened by an AI model; all grades are assigned by the lecturer.
+    What you hand in
+
+    Your public GitHub repository, the same one as in Laboratory 1, at the receipted tag, with these paths at its root:
+    path	what
+    fixtures/	the practice log and its published expected values, copied from the package
+    metrics/ (or wherever your code lives)	the metric computation behind POST /dora/metrics
+    metrics.json	the metric object for the practice fixture, exactly as your service returns it
+    EDGE-CASES.md	front matter with six declared counts, the sections ## E1 to ## E6, and the final section ## Gaming demonstration
+    gaming/after.jsonl	the transformed event log
+    gaming.json	metric, rule, before, after
+    PREDICTION.md and METR.md; rework-class.json with the captured payload; the tests service	Stretch only, two of the three
+    Rules
+        AI use: level 3 (AI-assisted). Free choice of tool; disclose it and own the result. A paid plan is never on the Core path: Claude Code, Gemini CLI, GitHub Copilot Free, a local model or no AI at all reach the same grade bands. You are not graded on whether your assistant got the definitions right, only on whether your service follows METRIC-SPEC.md.
+        No network at run time. Your image installs its dependencies at build time.
+        Build, do not pull. svcdesk keeps its build: key.
+        No bind mounts, in any override file or through .env either; named volumes and tmpfs are fine.
+        Prediction before the feature (Stretch 1 only). The prediction receipt comes first; only then the feature's commits.
+        Tags never move. Each attempt is a new tag (lab2/v1, lab2/v2, lab2/v3); a tag that moved after its receipt voids that attempt, and the attempt still counts.
+        Public repository, no personal data. A private repository cannot be receipted or graded; no hostnames, usernames or doctor output belong in it.
+        AI-disclosure header on every checked file, as described at the end of Laboratory instructions.
+    How it is validated
+
+    Tier A (your laptop and your repository's workflow) checks you against the practice fixture, whose expected values are published, so you can see every failure before you submit. Tier B clones your repository at the receipted tag, serves your service a different log generated from your own seed, and compares your answer with values computed from METRIC-SPEC.md itself. On a mismatch the grade report names the field and the rule, never the expected value, so a classmate's metrics.json is worthless to you. L2-CORE-6 is decided from your receipts; your reported result is not used.
+
+    Step-by-step instructions are in Laboratory instructions below. The documents in the package are the source of truth: where this page and the package differ, the package wins.
+    Laboratory 2 package Folder
+
+    The eight files of Laboratory 2, exactly as the course team published them. Start with HANDOUT.md, the full laboratory sheet. Then read, in this order: METRIC-SPEC.md (the whole rulebook, R-01 to R-21), CHECKS.md (every check the checker runs), and the two templates, EDGE-CASES-template.md and gaming-template.json. README.md says in one table what each file is. The fixtures/ subfolder holds the practice event log events-practice.jsonl and its published expected values metrics-practice.json; copy the whole folder into the root of your repository. Download folder gives you all eight files as one ZIP, with the subfolder intact.
+
+    These files are the source of truth for what the checker enforces. Where this Moodle page and these documents differ, the documents win. When a document links to the course README.md, the same information (checker, receipts, attempts, deadlines) is in Laboratory instructions below and on the How grading works, technically page in the General section.
+
+    Laboratory instructions
+
+    Every command runs in the root of your repository. On Linux and macOS use ./itsmlab.sh; on Windows PowerShell use .\itsmlab.ps1, and ; where the examples chain commands with &&. Every laboratory follows the same ten steps: steps 0 to 3 are specific to the laboratory, and steps 4 to 9 are identical in every laboratory, only the number changes. One order matters in this laboratory, and only if you attempt Stretch 1: the prediction is receipted before the feature exists, and L2-CORE-6 checks exactly that.
+    The 150 minutes
+    #	Core item	min	by minute	step
+    1	Read METRIC-SPEC.md; open fixtures/events-practice.jsonl and find the six edge cases by eye	10	10	1
+    2	POST /dora/metrics: parse and validate the log, apply the window, compute the five metrics	30	40	3
+    3	The six edge-case rules, until metrics-practice.json matches field for field	25	65	3
+    4	GET /dora/ticket-events	10	75	3
+    5	EDGE-CASES.md: six sections, and the counts your own service reports	15	90	3
+    6	The gaming demonstration: gaming/after.jsonl, gaming.json and the ## Gaming demonstration section	15	105	3
+    7	Write metrics.json, run the checker, commit, tag, take the submission receipt	5	110	3 to 8
+
+    The Core items take 110 minutes; the remaining 40 are slack. If an item overruns by more than its budget, stop, run the checker, and ask on the forum with the check id.
+    Step 0. Check your setup
+
+    docker pull ghcr.io/swasik/itsmlab:2026
+    ./itsmlab.sh --version   # Linux, macOS
+    .\itsmlab.ps1 --version  # Windows PowerShell
+
+    The second command prints the checker version; this laboratory needs itsmlab 0.3.2 or newer, the version the grader runs since 26 September. An image older than 0.3.0 does not know Laboratory 2 at all: checks 2 and verify 2 fail with it. 0.3.1 runs them, but its submit 2 --kind prediction does not yet refuse a PREDICTION.md without front matter or warn about commits that already touch feature_path. Your repository does not change; the checker image is the only thing you update. In itsmlab.yaml, repository: must hold your real <your GitHub login>/<your repository> before your first submit; the template's placeholder is refused with a message. Leave baselines: as {}, or declare lab1: student: no checkpoint is published for Laboratory 2, and nothing in this laboratory reads the field. Leave the other keys as they are.
+    Step 1. Copy the practice fixtures into your repository
+
+    Download Laboratory 2 package (the Download folder button gives one ZIP) and copy its fixtures/ folder into the root of your repository, so that you have fixtures/events-practice.jsonl and fixtures/metrics-practice.json. You need the log locally to compute metrics.json and to build gaming/after.jsonl. The checker carries its own copy of both files inside the image, so verify 2 works with no network, and editing your copy changes nothing it checks.
+
+    A useful ten minutes before you read METRIC-SPEC.md: ask your assistant for the five DORA metric definitions, keep its answer, and later mark it up against the six rules. It shows where AI helps and where it confidently does not, and it costs you nothing if the answer turns out to be right.
+    Step 2. Take the prediction receipt, before the feature (Stretch 1 only)
+
+    Skip this step if you do not attempt Stretch 1. Otherwise do it before you write the first line of the feature you will measure. Write PREDICTION.md with the front matter that CHECKS.md lists for L2-STRETCH-1.01 (feature, predicted_minutes, predicted_at, feature_path), then commit and push it:
+
+    git add PREDICTION.md
+    git commit -m "Lab 2 prediction"
+    git push origin main
+    ./itsmlab.sh submit 2 --kind prediction   # Linux, macOS
+    .\itsmlab.ps1 submit 2 --kind prediction  # Windows PowerShell
+
+    The command never opens an issue for you. It checks locally what it can (that repository: is filled in, and that main is already on origin), then prints a prefilled issue-form URL. Do not pass --text: without it the command files the contents of PREDICTION.md, and the receipt binds the sha256 of exactly that text, which is what the grader re-hashes. Open the URL in a browser while logged in to GitHub as the login on the roster, check the fields, and click Submit new issue. Within about a minute the course bot comments with your receipt and labels the issue receipted. Push nothing between running the command and the receipt: the bot refuses a prediction whose commit is no longer the head of main; if you did, run the command again and open the new URL. The command also refuses a PREDICTION.md without front matter or without feature_path, and warns if commits already touch feature_path, because such a prediction can never be confirmed. Keep the issue URL: you paste it into the assignment in step 8. Only then start the feature, and do not edit PREDICTION.md afterwards or type a text of your own into the issue form: either breaks the match with the receipt. A prediction the grader cannot confirm costs Stretch 1, not Core; deleting PREDICTION.md withdraws it. The feature's commits must descend from the main SHA the receipt names; git dates are never used, so back-dating a commit achieves nothing.
+
+    If the bot refuses instead (for example, the repository is not on the roster), fix the cause and open a new issue: a refused issue is not a receipt.
+    Step 3. Implement, and run the checker as often as you like
+
+    What you work from: METRIC-SPEC.md defines every field your endpoint returns and every rule behind it; the check identifiers the table prints back at you are listed in CHECKS.md; metrics-practice.json is the answer your service must reproduce for the practice log.
+
+    ./itsmlab.sh verify 2                      # Linux, macOS
+    .\itsmlab.ps1 verify 2                     # Windows PowerShell
+    ./itsmlab.sh verify 2 --json report.json   # Linux, macOS
+    .\itsmlab.ps1 verify 2 --json report.json  # Windows PowerShell
+
+    Local runs are unlimited and never count as attempts. The exit code is 0 when every Core specification passes, 1 when at least one does not, and 2 when the checker itself could not run. The table prints one row per specification, with status pass, fail, error or skip; L2-CORE-6 is always skip locally, because only the grader can see your receipts. Core passes when no Core specification is fail or error.
+
+    On your Laboratory 1 service, before the new endpoints exist, expect L2-CORE-1 to pass and the specifications that post a log to POST /dora/metrics to fail or to be reported as error, with the request and the response in the message. That is the normal starting point, not a broken setup. The item that usually overruns is the edge-case rules: L2-CORE-3.12 to L2-CORE-3.14 name the anomaly and the rule, which is usually enough to find the edge case you got wrong.
+
+    What you produce in this step, besides the code:
+        metrics.json - the object your running service returns for the practice fixture over the published window, from 2026-09-01T00:00:00Z, to 2026-09-22T00:00:00Z. Check L2-CORE-3.16 compares it with your service field by field.
+        EDGE-CASES.md - start from EDGE-CASES-template.md. Replace each of the six count values with what your own service reports (the table in the template names the field for each one), keep the rule values unchanged, fill the three labels of every section with at least 20 characters of real text, put a number instead of the ?? in the AI-disclosure line, and delete the template's instructions. End the file with the section ## Gaming demonstration described in What is graded above.
+        gaming/after.jsonl and gaming.json - build after.jsonl from the practice log. You may add events, move a deployment later, and change a deployment's commits, unplanned and caused_by; you may not delete an event, re-time a commit, move a deployment earlier or flip an outcome (R-19). Start gaming.json from gaming-template.json: before and after are the full metric objects your own service returns for the practice log and for gaming/after.jsonl. The checker re-derives both, so writing numbers by hand achieves nothing.
+        For Stretch, two of: METR.md after the feature from step 2 is built, rework-class.json with the captured gh api payload, and the compose tests service.
+    Step 4. Commit and push the implementation
+
+    git status
+    git add -A
+    git commit -m "Lab 2 attempt 1"
+    git push origin main
+
+    Step 5. Verify the committed tree, and go through the checklist
+
+    Run ./itsmlab.sh verify 2 (Windows: .\itsmlab.ps1 verify 2) once more and check two things: it exits 0, and its commit line does not say (dirty). (dirty) means your working directory holds changes that are not in the commit, so the grader would evaluate different files from the ones you just tested. Then go through the checklist; if anything on it is missing, fix it and return to step 4.
+        ./itsmlab.sh verify 2 (Windows: .\itsmlab.ps1 verify 2) exits 0: every Core specification pass, L2-CORE-6 skip;
+        metrics.json equals what your service returns for the practice fixture;
+        the six counts in EDGE-CASES.md equal what your service reports, the rule values are unchanged, each of the three labels in each of the six sections carries real text, and the file ends with ## Gaming demonstration;
+        gaming/after.jsonl keeps every base event as R-19 requires, and before and after in gaming.json are your own service's answers;
+        fixtures/ is committed;
+        for Stretch 1: the prediction receipt exists, no commit of the feature predates it, and PREDICTION.md has not changed since;
+        every checked file, EDGE-CASES.md included, carries the ai-generated: header;
+        itsmlab.yaml names your repository, and the repository is public;
+        the implementation is committed and pushed, git status is clean, and verify 2 did not say (dirty);
+        for Stretch, two of: the METR n=1 replication, rework-class.json with its payload, the tests profile with its summary line.
+    Step 6. Tag that commit and push the tag
+
+    git tag -a lab2/v1 -m "Lab 2 attempt 1"
+    git push origin lab2/v1
+
+    -a creates an annotated tag, which is the form the receipt workflow resolves. Use lab2/v1 for the first attempt, lab2/v2 for the second and lab2/v3 for the third. A tag never moves: if you change anything after the receipt, do not move the tag, go back to step 4 and use the next tag name. A tag that moved after its receipt voids that attempt, and the attempt still counts.
+    Step 7. Take the submission receipt
+
+    ./itsmlab.sh submit 2 --kind submission --tag lab2/v1   # Linux, macOS
+    .\itsmlab.ps1 submit 2 --kind submission --tag lab2/v1  # Windows PowerShell
+
+    It prints a warning: when the working tree has uncommitted changes or when HEAD has moved past the tag, and it prints the commit and the tree_sha it will claim. Open the printed URL while logged in to GitHub as the login on the roster, check the fields, and click Submit new issue. Within about a minute the course bot comments with your receipt and labels the issue receipted. If it refuses instead (the repository is not on the roster, the tag was not found, this would be a fourth attempt), fix the cause and open a new issue: a refused issue is not an attempt.
+    Step 8. Record the submission in Moodle
+
+    Paste into the Laboratory 2 assignment below, as online text: the URL of the submission issue, the tag you submitted, and, only if you attempted Stretch 1, the URL of your prediction receipt issue from step 2. For a later attempt, edit the same submission and paste the newest issue URL and tag. This step is required: the grade comes from the receipt, never from the text you paste there, but that entry is where your mark is recorded, and Laboratory 2 is not complete without it.
+    Step 9. Read your grade, and decide on another attempt
+
+    The grade arrives as a comment itsmlab grade on the submission issue, usually within twenty minutes, with grade.json and its Sigstore bundle. If nothing appears within an hour, ask on the forum with the issue number. How to check that the signature is genuine is on the How grading works, technically page in the General section. To improve the result, fix the cause and go back to step 4 with the next tag; the best of the three attempts counts.
+    Deadlines
+        Attempt 1: Sunday 27 September 2026, 23:59:59 (Europe/Warsaw). Advisory: a later receipt is marked after_attempt1_due and still counts.
+        Attempts 2 and 3, the correction window: receipted before Saturday 10 October 2026, 08:00:00, when session 3 starts. A receipt after that instant is late and does not count.
+        Laboratory 1 closes earlier: its correction window ends on Sunday 27 September 2026, 23:59:59.
+        The best of the up to three attempts counts. Local checker runs are unlimited and never count.
+    What the commands and their parameters mean
+
+    Verified against the checker's own command-line definition (itsmlab 0.3.2), not only the handout.
+    Command or flag	What it does
+    --version	prints the checker version and exits
+    --debug	shows pytest's own output on stderr. It is a top-level flag, so it goes before the subcommand: ./itsmlab.sh --debug verify 2 (Windows: .\itsmlab.ps1 --debug verify 2). Attach its output to a forum question about a check you cannot explain
+    doctor	preflight: Docker, compose, git, free disk and repository layout; the table you pasted into the pre-work assignment
+    checks 2	prints the published checks of laboratory 2 as a table, and checks 2 --markdown prints them in the format of CHECKS.md. Nothing is built or started, so you can read every rule before your service works
+    verify 2	runs Tier A for laboratory 2 in the current directory
+    fixture 2	prints the practice event log shipped inside the checker image; fixture 2 --name metrics-practice.json prints its expected values. They are the same files as fixtures/ in the package; on Windows take them from the package, because PowerShell redirection re-encodes the output
+    submit 2 --kind prediction	Stretch 1 only: prints the prefilled issue-form URL that binds the contents of PREDICTION.md to the current main SHA, which must already be on origin
+    submit 2 --kind submission --tag lab2/v1	prints the prefilled issue-form URL for an attempt, naming a tag that must exist locally and on origin. --kind is required and accepts exactly submission, specs or prediction
+    --json report.json	writes the JSON report to that path (the file is in the template's .gitignore)
+    --keep	does not tear the compose project down after the run, so you can inspect it
+    --project NAME	overrides the compose project name; the default is itsmlab- plus 8 hexadecimal characters derived from your directory path
+    --prune-images	after the run, also removes the images compose built for this project (down --rmi local); later runs then rebuild from the build cache
+    --base-url URL	checks a service you started yourself instead of starting it with compose; the file checks still run on the current directory
+    --probe-window SECONDS	with --base-url: how long to wait for GET /health to answer 200 (10 seconds by default)
+    --tests-result PATH	with --base-url: the captured result of the tests service (the own-tests Stretch option), since that service is not run in this mode
+    ITSMLAB_IMAGE	environment variable choosing the checker image. Order of precedence: ITSMLAB_IMAGE, then checker_image: in itsmlab.yaml, then ghcr.io/swasik/itsmlab:2026
+
+    The wrapper passes every argument through to the checker unchanged. It mounts your current directory at the same absolute path on Linux and macOS, and at /work on Windows, and it mounts the Docker socket (/var/run/docker.sock, unless DOCKER_HOST points at another Unix socket, as with rootless Docker, Colima or OrbStack).
+
+    Under --base-url the URL must be reachable from inside the checker's own container: on Docker Desktop that is http://host.docker.internal:8080, on Linux http://172.17.0.1:8080.
+    What the receipt fields mean
+
+    Three fields decide how an attempt counts. attempt is 1, 2 or 3, and the best of them counts; a fourth issue is refused. after_attempt1_due: true means the receipt arrived after the advisory Sunday deadline: it is recorded and still counts. late: true means it arrived after the correction window closed: it is graded and does not count. commit, tree_sha and archive_sha256 are the content digest Tier B grades; nothing outside that digest is evaluated. A prediction receipt is not an attempt: it only fixes the moment your prediction and its main SHA became public, which is what L2-CORE-6 checks.
+    The AI-disclosure header
+
+    Every file under src/, specs/ and metrics/ with extension .py .go .ts .js .java .cs .rb .rs .kt .md, plus DECISIONS.md and EDGE-CASES.md, must carry in its first ten lines a comment matching ai-generated: <0-100>% - <one line on how>, for example # ai-generated: 70% - Gemini CLI wrote the parser, I wrote the six rules or <!-- ai-generated: 30% - outline by an assistant, text mine -->. In EDGE-CASES.md it goes on the line right after the closing --- of the front matter, as the template shows, and the template's ?? placeholder is flagged until you replace it with a number. YAML, shell, Dockerfiles and requirements.txt need no header. Missing headers are reported as an advisory in report.json, not graded; the course rules require the header on every checked file.
+    Laboratory 2 - Measure your own delivery, and prove the metrics are gameable Assignment
+
+    Laboratory 2 - Measure your own delivery, and prove the metrics are gameable.
+
+    Your work is submitted in GitHub, through a receipt. This Moodle activity records it, so that the mark has a place in the gradebook and so that you can see at a glance what you handed in. Both are required: Laboratory 2 is not complete without an entry in this activity. The grade comes from the receipted digest, never from the text you paste here, but this entry is where your mark is recorded.
+
+    Paste here, as online text (step 8 of Laboratory instructions):
+        the URL of your submission issue in swasik/itsm-2026-submissions, in the form https://github.com/swasik/itsm-2026-submissions/issues/<number>. It is the issue you opened from the URL that ./itsmlab.sh submit 2 --kind submission --tag lab2/v1 (Windows: .\itsmlab.ps1 submit 2 --kind submission --tag lab2/v1) printed, and it must carry the labels receipted, lab:2 and kind:submission. If it does not carry receipted, the bot has not accepted it and it is not a submission;
+        the tag you submitted: lab2/v1, lab2/v2 or lab2/v3;
+        only if you attempted Stretch 1: the URL of your prediction receipt issue from step 2 (labels receipted, lab:2, kind:prediction). That receipt is the evidence for L2-CORE-6, the prediction-before-feature rule, which is the one Core specification your local checker can never decide.
+
+    If you file a later attempt, edit this submission and paste the newest issue URL and tag.
+
+    What is actually graded. Tier B clones your public repository at the receipted tag and grades exactly those files, against an event log generated from your own seed. Your working directory, your local checker output and the text in this box are not evaluated. A tag that moved after its receipt voids that attempt, and the attempt still counts.
+
+    Deliverable in the repository: fixtures/, the metrics/ module (or wherever your code lives), metrics.json, EDGE-CASES.md ending with the section ## Gaming demonstration, gaming/after.jsonl and gaming.json; for Stretch, two of PREDICTION.md with METR.md, rework-class.json with the captured payload, and the tests service.
+
+    Weight: 12.5 % of the course - Core bundle 8 %, Stretch bundle 3 %, reasoning artifact (EDGE-CASES.md with the gaming write-up) 1.5 %.
+
+    Deadlines. Attempt 1 is due Sunday 27 September 2026, 23:59:59 (advisory - a later receipt is marked after_attempt1_due and still counts). Attempts 2 and 3 must be receipted before Saturday 10 October 2026, 08:00:00; after that instant a receipt is marked late, is graded and does not count. This activity accepts entries until Saturday 10 October 2026, 08:00. The best of the up to three attempts counts. Local checker runs are unlimited and never count.
+
+    Step-by-step instructions, with every parameter explained, are in Laboratory instructions above. The full laboratory sheet is HANDOUT.md in Laboratory 2 package. The machinery behind the grade is described on the How grading works, technically page in the General section.
+

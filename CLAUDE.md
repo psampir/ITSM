@@ -5,8 +5,8 @@ Project guidance for AI coding agents working on the `svcdesk` repository (Lab 1
 ## What this repository is
 
 `svcdesk` is a small service-desk HTTP API (tickets, priority, SLA clocks, state machine) built with Python
-3.13, FastAPI and SQLite, shipped with Docker Compose. The enforced contract is `docs/API.md`; the requirements
-are `docs/REQUIREMENTS.md`; the published checks are `docs/CHECKS.md`. Where documents differ, `docs/API.md`
+3.13, FastAPI and SQLite, shipped with Docker Compose. The enforced contract is `docs/lab1/API.md`; the requirements
+are `docs/lab1/REQUIREMENTS.md`; the published checks are `docs/lab1/CHECKS.md`. Where documents differ, `docs/lab1/API.md`
 wins.
 
 ## Decisions already made (do not silently change them)

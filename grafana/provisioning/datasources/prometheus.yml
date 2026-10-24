@@ -1,0 +1,12 @@
+# grafana/provisioning/datasources/prometheus.yml - the datasource your dashboards use.
+# The uid is `prometheus` on purpose: every panel query of the exported dashboards points at it.
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    uid: prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false

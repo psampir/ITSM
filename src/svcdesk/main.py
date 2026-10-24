@@ -1,23 +1,25 @@
 # ai-generated: 85% - opencode drafted the svcdesk API (routes, validation, state machine) from the specification; reviewed and tested by the student
-"""svcdesk - service-desk API (Lab 1).
+"""svcdesk - service-desk API (Lab 1, extended by Lab 3).
 
 Decisions implemented: C1 = wallclock, C2 = reopen, C3 = vip.
+Lab 3 adds GET /kb/search (M-02), the request histogram (M-03 to M-07) and GET /metrics.
 """
 
 from __future__ import annotations
 
 import os
 import uuid
+from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from fastapi import FastAPI, Header, Query, Request
+from fastapi import FastAPI, Header, Query, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from . import metrics, sla, store
+from . import kb, metrics, sla, store, telemetry
 
 C1 = "wallclock"
 C2 = "reopen"
@@ -59,7 +61,18 @@ class TicketCreate(BaseModel):
     related_to: Optional[str] = None
 
 
-app = FastAPI(title="svcdesk", version="1.0.0")
+@asynccontextmanager
+async def _lifespan(_app: FastAPI):
+    """One pooled HTTP client for kb-index, closed on shutdown (Lab 3, M-02)."""
+    _app.state.kb_client = kb.new_client()
+    try:
+        yield
+    finally:
+        await _app.state.kb_client.aclose()
+
+
+app = FastAPI(title="svcdesk", version="1.1.0", lifespan=_lifespan)
+app.add_middleware(telemetry.RequestMetricsMiddleware)
 
 
 @app.exception_handler(ApiError)
@@ -146,6 +159,23 @@ def load_ticket(ticket_id: str) -> dict:
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok", "service": "svcdesk"}
+
+
+@app.get("/metrics", include_in_schema=False)
+def prometheus_metrics() -> Response:
+    """Prometheus text exposition of the request histogram (M-03)."""
+    body, content_type = telemetry.render()
+    return Response(content=body, media_type=content_type)
+
+
+@app.get("/kb/search")
+async def kb_search(q: str = Query(min_length=1, max_length=kb.MAX_Q_LENGTH)) -> dict:
+    """Proxy one knowledge-base search to kb-index (M-02)."""
+    try:
+        hits = await kb.search(app.state.kb_client, q)
+    except kb.UpstreamUnavailable as exc:
+        raise ApiError(502, "upstream_unavailable", f"kb-index is unavailable: {exc}") from exc
+    return {"query": q, "hits": hits}
 
 
 @app.post("/tickets", status_code=201)

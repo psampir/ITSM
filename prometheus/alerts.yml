@@ -1,0 +1,85 @@
+# ai-generated: 75% - opencode drafted the three rules and their expressions from the SLO I chose in slo.md; I checked the burn-rate arithmetic and wrote the promtool tests
+# prometheus/alerts.yml - the SLO alerts of svcdesk (MONITORING-SPEC.md M-17 to M-21).
+#
+# Every alert slo.md declares is exactly one rule here, with the same name.  Each rule carries the three labels the
+# checker requires (service, slo, severity), filters the route and never selects an instance, compares both windows
+# against a constant written into the expression, and keeps a short window so that it resets when the burn stops.
+groups:
+  - name: svcdesk-slo
+    rules:
+      # Availability, fast burn: 14.4 x (1 - 0.99) = 14.4 % of the requests failing, over one hour and over five
+      # minutes.  Fires as P1: the 28-day budget is gone in about two days at this rate.
+      - alert: KbSearchAvailabilityBurnFast
+        expr: |
+          (
+            sum(rate(http_server_request_duration_seconds_count{job="svcdesk", http_route="/kb/search", http_response_status_code=~"5.."}[1h]))
+              /
+            sum(rate(http_server_request_duration_seconds_count{job="svcdesk", http_route="/kb/search"}[1h]))
+          ) > 14.4 * (1 - 0.99)
+          and
+          (
+            sum(rate(http_server_request_duration_seconds_count{job="svcdesk", http_route="/kb/search", http_response_status_code=~"5.."}[5m]))
+              /
+            sum(rate(http_server_request_duration_seconds_count{job="svcdesk", http_route="/kb/search"}[5m]))
+          ) > 14.4 * (1 - 0.99)
+        for: 5m
+        labels:
+          service: svcdesk
+          slo: availability
+          severity: P1
+        annotations:
+          summary: "GET /kb/search is failing 14.4x faster than the 99 % availability budget allows (1h and 5m windows)"
+
+      # Availability, slow burn: 6 x (1 - 0.99) = 6 %, over six hours and thirty minutes.  Chat, not a page.
+      - alert: KbSearchAvailabilityBurnSlow
+        expr: |
+          (
+            sum(rate(http_server_request_duration_seconds_count{job="svcdesk", http_route="/kb/search", http_response_status_code=~"5.."}[6h]))
+              /
+            sum(rate(http_server_request_duration_seconds_count{job="svcdesk", http_route="/kb/search"}[6h]))
+          ) > 6 * (1 - 0.99)
+          and
+          (
+            sum(rate(http_server_request_duration_seconds_count{job="svcdesk", http_route="/kb/search", http_response_status_code=~"5.."}[30m]))
+              /
+            sum(rate(http_server_request_duration_seconds_count{job="svcdesk", http_route="/kb/search"}[30m]))
+          ) > 6 * (1 - 0.99)
+        for: 30m
+        labels:
+          service: svcdesk
+          slo: availability
+          severity: P2
+        annotations:
+          summary: "GET /kb/search has been failing 6x faster than the 99 % availability budget allows for six hours"
+
+      # Latency, slow burn: the share of requests above the SLI threshold (0.125 s, one of the ladder's boundaries)
+      # is 6 x (1 - 0.98) = 12 %, over six hours and thirty minutes.  The availability burn rate cannot see this:
+      # every one of those slow requests is a 200.
+      - alert: KbSearchLatencyBurnSlow
+        expr: |
+          (
+            (
+              sum(rate(http_server_request_duration_seconds_count{job="svcdesk", http_route="/kb/search"}[6h]))
+                -
+              sum(rate(http_server_request_duration_seconds_bucket{job="svcdesk", http_route="/kb/search", le="0.125"}[6h]))
+            )
+              /
+            sum(rate(http_server_request_duration_seconds_count{job="svcdesk", http_route="/kb/search"}[6h]))
+          ) > 6 * (1 - 0.98)
+          and
+          (
+            (
+              sum(rate(http_server_request_duration_seconds_count{job="svcdesk", http_route="/kb/search"}[30m]))
+                -
+              sum(rate(http_server_request_duration_seconds_bucket{job="svcdesk", http_route="/kb/search", le="0.125"}[30m]))
+            )
+              /
+            sum(rate(http_server_request_duration_seconds_count{job="svcdesk", http_route="/kb/search"}[30m]))
+          ) > 6 * (1 - 0.98)
+        for: 30m
+        labels:
+          service: svcdesk
+          slo: latency
+          severity: P3
+        annotations:
+          summary: "GET /kb/search is serving 12 % of requests slower than 0.125 s, 6x the 98 % latency budget"

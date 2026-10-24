@@ -1,0 +1,36 @@
+# ai-generated: 80% - opencode drafted the tree and the inhibit rule; I checked both directions of the equal-labels pair on a running Alertmanager
+# alertmanager/alertmanager.yml - the routing tree (INCIDENT-SPEC.md I-04 to I-08).
+#
+# P1 pages the on-call; P2 and P3 go to chat and never to the pager. The root receiver is chat, so an alert that
+# matches no child falls to chat rather than to the pager.
+#
+# The inhibition: while a P1 fires in a cluster, the P2 and P3 alerts of the same cluster are muted - the page is
+# enough, the cause can wait for the on-call to look. `equal: [cluster]` is the equal-labels property proved in both
+# directions by routing-tests.yml: a P2 in the same cluster is suppressed, the same P2 in another cluster is not.
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: chat
+  group_by: [alertname, service, cluster]
+  group_wait: 10s
+  group_interval: 1m
+  repeat_interval: 4h
+  routes:
+    - matchers: ['severity="P1"']
+      receiver: pager
+
+receivers:
+  - name: pager
+    webhook_configs:
+      - url: http://pager:8080/hook/pager
+        send_resolved: true
+  - name: chat
+    webhook_configs:
+      - url: http://pager:8080/hook/chat
+        send_resolved: true
+
+inhibit_rules:
+  - source_matchers: ['severity="P1"']
+    target_matchers: ['severity=~"P2|P3"']
+    equal: [cluster]

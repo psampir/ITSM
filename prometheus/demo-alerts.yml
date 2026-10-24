@@ -1,0 +1,70 @@
+# ai-generated: 75% - opencode drafted the four rules from the shop's span metrics and the incident I worked; I checked every expression against the recording and kept them quiet on its baseline
+# prometheus/demo-alerts.yml - symptom alerts on the shop (INCIDENT-SPEC.md I-01, I-02, I-05).
+#
+# Metrics: the demo's collector turns every span into traces_span_metrics_calls_total (counter) and
+# traces_span_metrics_duration_milliseconds_bucket (histogram, MILLISECONDS), labelled with service_name, span_name,
+# span_kind and status_code. One sample a minute, so every window is at least 5m; only SERVER spans count, because the
+# load generator's own CLIENT calls fail on the healthy shop too.
+#
+# The incident of 12 October 2026 showed both symptoms the injector can produce: checkout failing (paymentFailure)
+# and the shop flooded (loadGeneratorFloodHomepage). The two P1 rules cover both; the P2 rules are the causes an
+# on-call reads after the page, and the inhibition mutes them while the P1 fires.
+groups:
+  - name: shop-symptoms
+    rules:
+      # P1: checkout is failing its callers. 5 % of the PlaceOrder requests over five minutes, for two.
+      - alert: ShopCheckoutErrorRate
+        expr: |
+          sum(rate(traces_span_metrics_calls_total{service_name="checkout", span_kind="SPAN_KIND_SERVER", status_code="STATUS_CODE_ERROR"}[5m]))
+            /
+          sum(rate(traces_span_metrics_calls_total{service_name="checkout", span_kind="SPAN_KIND_SERVER"}[5m]))
+            > 0.05
+        for: 2m
+        labels:
+          service: checkout
+          severity: P1
+          cluster: shop
+        annotations:
+          summary: "More than 5 % of the requests checkout answered in the last five minutes failed"
+
+      # P1: checkout is slow for its callers. p99 of the SERVER spans above 2 s, for two minutes - the shop's own
+      # canary is 1 s, so 2 s is already the users noticing.
+      - alert: ShopCheckoutLatency
+        expr: |
+          histogram_quantile(0.99,
+            sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{service_name="checkout", span_kind="SPAN_KIND_SERVER"}[5m]))
+          ) > 2000
+        for: 2m
+        labels:
+          service: checkout
+          severity: P1
+          cluster: shop
+        annotations:
+          summary: "The p99 of checkout's own responses has been above two seconds for two minutes"
+
+      # P2: a cause, not a symptom - payment is refusing charges. Chat, not a page: the P1 above already paged.
+      - alert: ShopPaymentErrors
+        expr: |
+          sum(rate(traces_span_metrics_calls_total{service_name="payment", span_kind="SPAN_KIND_SERVER", status_code="STATUS_CODE_ERROR"}[5m]))
+            > 0.05
+        for: 5m
+        labels:
+          service: payment
+          severity: P2
+          cluster: shop
+        annotations:
+          summary: "Payment is answering more than 0.05 failed Charge calls per second"
+
+      # P2: checkout is slower than usual but not yet slow enough to page. Inhibited while the P1 is firing.
+      - alert: ShopCheckoutSlowRequests
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{service_name="checkout", span_kind="SPAN_KIND_SERVER"}[5m]))
+          ) > 500
+        for: 5m
+        labels:
+          service: checkout
+          severity: P2
+          cluster: shop
+        annotations:
+          summary: "The p95 of checkout's own responses has been above 500 ms for five minutes"

@@ -1,0 +1,29 @@
+# ai-generated: 70% - opencode drafted the cases and ran amtool against each; I added the equal-labels pair and the Lab 3 alert
+# alertmanager/routing-tests.yml - the cases that prove the tree (INCIDENT-SPEC.md I-06 to I-08).
+#
+# routes: the label set of one real alert (its static labels plus alertname) and exactly what
+# `amtool config routes test` prints for it. The last two cases are Laboratory 3's svcdesk alerts, which join the same
+# tree.
+#
+# inhibitions: the equal-labels pair. The two targets have the same label names and differ only in `cluster`, the
+# label the inhibit rule lists in `equal`: the one in the same cluster as the firing P1 is suppressed, the one in
+# another cluster is not. Misspell `cluster` in the rule and both cases are suppressed, so the second one fails.
+routes:
+  - labels: {alertname: ShopCheckoutErrorRate, service: checkout, severity: P1, cluster: shop}
+    receivers: [pager]
+  - labels: {alertname: ShopPaymentErrors, service: payment, severity: P2, cluster: shop}
+    receivers: [chat]
+  - labels: {alertname: ShopCheckoutSlowRequests, service: checkout, severity: P2, cluster: shop}
+    receivers: [chat]
+  - labels: {alertname: KbSearchAvailabilityBurnFast, service: svcdesk, slo: availability, severity: P1}
+    receivers: [pager]
+  - labels: {alertname: KbSearchLatencyBurnSlow, service: svcdesk, slo: latency, severity: P3}
+    receivers: [chat]
+
+inhibitions:
+  - source: {alertname: ShopCheckoutErrorRate, service: checkout, severity: P1, cluster: shop}
+    target: {alertname: ShopCheckoutSlowRequests, service: checkout, severity: P2, cluster: shop}
+    inhibited: true
+  - source: {alertname: ShopCheckoutErrorRate, service: checkout, severity: P1, cluster: shop}
+    target: {alertname: ShopCheckoutSlowRequests, service: checkout, severity: P2, cluster: other}
+    inhibited: false

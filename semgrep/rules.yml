@@ -1,0 +1,32 @@
+# ai-generated: 70% - written with an assistant; the two guards and their ok-cases are mine, taken from the code in src/
+# Two guards for svcdesk (CI-SPEC.md P-31). Each one records a decision this service makes on purpose, and each
+# ok-case is something a careless rule would also report:
+#   svcdesk-unbounded-query-string      - every optional string a caller can send is capped with max_length; an
+#                                         unbounded filter lets a caller choose how much of it we keep in memory.
+#                                         src/svcdesk/main.py's list_tickets still has two uncapped ones, which is
+#                                         why the rule fires: they are read-only filters over stored tickets.
+#   svcdesk-shared-sqlite-connection    - the store opens one connection with check_same_thread=False and shares it
+#                                         across FastAPI's threadpool; every statement must therefore go through
+#                                         store._connection() while the lock is held. A second such connect()
+#                                         anywhere else would be a race, and the rule says so.
+rules:
+  - id: svcdesk-unbounded-query-string
+    languages: [python]
+    severity: WARNING
+    message: >-
+      An optional string query parameter has no max_length, so the caller decides how much of it the service keeps.
+    patterns:
+      - pattern: |
+          def $FUNC(..., $NAME: Optional[str] = Query(...), ...):
+              ...
+      - pattern-not: |
+          def $FUNC(..., $NAME: Optional[str] = Query(..., max_length=..., ...), ...):
+              ...
+
+  - id: svcdesk-shared-sqlite-connection
+    languages: [python]
+    severity: WARNING
+    message: >-
+      sqlite3.connect(..., check_same_thread=False) shares one connection across threads: every access must hold the
+      store's lock, and a second such connection anywhere else is a race.
+    pattern: sqlite3.connect(..., check_same_thread=False)

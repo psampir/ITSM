@@ -22,6 +22,8 @@ own code, outside `lab5-canary/`, in the receipted SARIF.
 | trivy | CVE-2026-97689 | fix | the second urllib3 HIGH from pip's vendored copy, fixed by the same `pip uninstall -y pip`; the base image is also pinned by digest. |
 | semgrep | dockerfile.security.missing-user.missing-user | fix | Dockerfile:23 - the image ran as root. It now creates uid 10001, chowns /app and /data, and ends with `USER svcdesk`; the service tests still pass 30/30 as that user. |
 | semgrep | python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected | false-positive | docs/lab4/prom_mcp.py:34 - the URL is the operator's own `--prometheus-url` argument of a local, read-only MCP bridge; no request data reaches urllib, so the rule's premise does not hold. |
+| semgrep | svcdesk-unbounded-query-string | accept | my own Stretch 3 rule: the two uncapped optional strings in `src/svcdesk/main.py` (list_tickets' state and priority) are read-only equality filters over stored tickets, never written back or echoed; accepted until the ticket store grows a full-text search. |
+| semgrep | svcdesk-shared-sqlite-connection | accept | my own Stretch 3 rule, a guard rather than a defect: `store.py`'s single connection is opened with `check_same_thread=False` on purpose and every statement runs under the module's lock; the rule exists to fail the build if a second one appears. |
 
 No `.trivyignore` or `.gitleaksignore` entry is needed: every gate is green on `main` without one, and a bare ignore
 would fail `ignore-policy` anyway.

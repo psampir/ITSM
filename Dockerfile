@@ -16,7 +16,13 @@ RUN pip install --no-cache-dir -r /app/requirements.txt && pip uninstall -y pip
 
 COPY src/ /app/src/
 
-RUN mkdir -p /data
+# Run as an unprivileged user (Semgrep dockerfile.security.missing-user): the named volume
+# svcdesk-data inherits the ownership of /data from the image, so the database stays writable.
+RUN useradd --create-home --uid 10001 svcdesk \
+    && mkdir -p /data \
+    && chown -R svcdesk:svcdesk /app /data
+USER svcdesk
+
 ENV SVCDESK_DB=/data/svcdesk.db
 
 EXPOSE 8080
